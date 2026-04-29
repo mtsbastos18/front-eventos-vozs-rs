@@ -1,6 +1,6 @@
 export interface EventModel {
   id: number;
-  name: string;
+  title: string;
   description: string;
   date: string;
   location: string;

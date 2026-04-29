@@ -30,7 +30,14 @@ export class EventDetailsComponent implements OnInit {
     cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
   });
 
+  verifyForm: FormGroup = this.fb.group({
+    code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+  });
+
   isSubmitting = false;
+  isVerifying = false;
+  registrationStep: 'form' | 'verification' = 'form';
+  registeredEmail = '';
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -79,23 +86,52 @@ export class EventDetailsComponent implements OnInit {
     this.eventService.registerParticipant(participantData).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.toastr.success(
-          'Você receberá um e-mail de confirmação em breve.',
-          'Inscrição realizada!',
+        this.registeredEmail = participantData.email;
+        this.registrationStep = 'verification';
+        this.toastr.info(
+          'Um código de 6 dígitos foi enviado para o seu e-mail.',
+          'Verifique seu e-mail',
         );
-        this.registrationForm.reset();
-
-        // Atualiza a contagem localmente após inscrição
-        if (this.event) {
-          this.event.registeredCount = (this.event.registeredCount || 0) + 1;
-        }
       },
       error: (err) => {
         console.log('Erro na inscrição:', err);
         this.isSubmitting = false;
         this.toastr.error(
-          err.error?.message || 'Erro ao realizar inscrição. Tente novamente.',
+          err.error?.message || 'Erro ao realizar pré-inscrição. Tente novamente.',
           'Erro',
+        );
+      },
+    });
+  }
+
+  onVerify() {
+    if (this.verifyForm.invalid || !this.event) return;
+
+    this.isVerifying = true;
+    const verifyData = {
+      email: this.registeredEmail,
+      event_id: this.event.id,
+      code: this.verifyForm.value.code,
+    };
+
+    this.eventService.verifyParticipant(verifyData).subscribe({
+      next: () => {
+        this.isVerifying = false;
+        this.toastr.success('Sua inscrição foi confirmada com sucesso!', 'Inscrição Confirmada');
+        this.registrationStep = 'form';
+        this.registrationForm.reset();
+        this.verifyForm.reset();
+
+        // Atualiza a contagem localmente após confirmar
+        if (this.event) {
+          this.event.registeredCount = (this.event.registeredCount || 0) + 1;
+        }
+      },
+      error: (err) => {
+        this.isVerifying = false;
+        this.toastr.error(
+          err.error?.message || 'Código inválido ou expirado.',
+          'Erro na Verificação',
         );
       },
     });

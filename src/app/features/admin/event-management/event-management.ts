@@ -28,7 +28,7 @@ export class EventManagementComponent implements OnInit {
   editingId: number | null = null;
 
   eventForm: FormGroup = this.fb.group({
-    name: ['', Validators.required],
+    title: ['', Validators.required],
     description: ['', Validators.required],
     date: ['', Validators.required],
     location: ['', Validators.required],
@@ -67,7 +67,7 @@ export class EventManagementComponent implements OnInit {
     const dateFormatted = event.date ? new Date(event.date).toISOString().slice(0, 16) : '';
 
     this.eventForm.patchValue({
-      name: event.name,
+      title: event.title,
       description: event.description,
       date: dateFormatted,
       location: event.location,

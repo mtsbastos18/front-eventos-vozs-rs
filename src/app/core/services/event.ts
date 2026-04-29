@@ -24,6 +24,10 @@ export class EventService {
     return this.http.post(`${this.apiUrl}/events/register`, data);
   }
 
+  verifyParticipant(data: { email: string; event_id: number; code: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/events/register/verify`, data);
+  }
+
   getDashboardMetrics(): Observable<any> {
     return this.http.get(`${this.apiUrl}/admin/events/dashboard`);
   }

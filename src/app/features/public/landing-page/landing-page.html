@@ -12,7 +12,7 @@
         </div>
 
         <div *ngIf="isLoading" class="flex justify-center my-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
         </div>
 
         <div *ngIf="error" class="text-center text-red-500 bg-red-100 p-4 rounded-lg my-10 max-w-2xl mx-auto">
@@ -26,8 +26,12 @@
         <div *ngIf="!isLoading && events.length > 0" class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div *ngFor="let event of events"
                 class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                <!-- Imagem de Capa do Evento -->
+                <img [src]="event.bannerUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'"
+                    alt="Capa do evento" class="w-full h-48 object-cover">
+
                 <div class="p-6 flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ event.name }}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ event.title }}</h3>
                     <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ event.description }}</p>
                     <div class="text-sm text-gray-500 mb-2">
                         <span class="font-medium">Data:</span> {{ event.date | date:'dd/MM/yyyy HH:mm' }}
@@ -42,7 +46,7 @@
                 </div>
                 <div class="bg-gray-50 px-6 py-4">
                     <a [routerLink]="['/events', event.id]"
-                        class="block text-center w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 focus:outline-none transition-colors">
+                        class="block text-center w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 focus:outline-none transition-colors">
                         Ver Detalhes
                     </a>
                 </div>
