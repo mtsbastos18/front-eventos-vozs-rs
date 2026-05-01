@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgxMaskPipe } from 'ngx-mask';
 import { EventService } from '../../../core/services/event';
 import { Participant } from '../../../shared/models/participant';
 import { EventModel } from '../../../shared/models/event';
@@ -9,7 +10,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar';
 
 @Component({
   selector: 'app-participant-list',
-  imports: [CommonModule, NavbarComponent, RouterLink],
+  imports: [CommonModule, NavbarComponent, RouterLink, NgxMaskPipe],
   templateUrl: './participant-list.html',
   styleUrl: './participant-list.css',
 })
@@ -23,6 +24,7 @@ export class ParticipantListComponent implements OnInit {
   participants: Participant[] = [];
   isLoading = true;
   error = '';
+  deletingParticipantId: number | null = null;
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -58,5 +60,22 @@ export class ParticipantListComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  deleteParticipant(participantId: number): void {
+    if (confirm('Tem certeza que deseja remover este participante?')) {
+      this.deletingParticipantId = participantId;
+      this.eventService.deleteParticipant(this.eventId, participantId).subscribe({
+        next: () => {
+          this.participants = this.participants.filter((p) => p.id !== participantId);
+          this.toastr.success('Participante removido com sucesso!', 'Sucesso');
+          this.deletingParticipantId = null;
+        },
+        error: () => {
+          this.toastr.error('Erro ao remover o participante.', 'Erro');
+          this.deletingParticipantId = null;
+        },
+      });
+    }
   }
 }

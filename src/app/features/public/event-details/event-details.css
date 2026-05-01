@@ -1,0 +1,17 @@
+h1.banner {
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+::ng-deep .ql-editor {
+    word-break: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+::ng-deep .ql-editor * {
+    word-break: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}

@@ -2,13 +2,14 @@
 
 <div *ngIf="!isLoading && event" class="w-full h-64 md:h-80 lg:h-96 bg-gray-200 relative overflow-hidden">
     <!-- Imagem de Banner que virá do backend. Utilizando placeholder temporário caso não exista -->
-    <img [src]="event.bannerUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'"
+    <img [src]="event.image_path ? storageUrl + event.image_path : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'"
         alt="Banner do evento" class="w-full h-full object-cover">
-    <div class="absolute inset-0  bg-opacity-30 flex items-end">
+    <!-- <div class="absolute inset-0  bg-opacity-30 flex items-end">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-8">
-            <h1 class="text-3xl md:text-5xl font-extrabold text-white drop-shadow-md">{{ event.title }}</h1>
+            <h1 class="banner text-3xl md:text-5xl font-extrabold text-white drop-shadow-md">{{ event.title }}</h1>
+            <p *ngIf="event.subtitle" class="text-xl text-white drop-shadow-md mt-2">{{ event.subtitle }}</p>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <div class="min-h-screen bg-gray-50 py-10">
@@ -33,20 +34,30 @@
             <!-- Detalhes do Evento -->
             <div class="lg:col-span-2 space-y-6">
                 <div class="bg-white rounded-lg shadow-md p-8">
-                    <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ event.title }}</h1>
+                    <h1 class="text-4xl font-extrabold text-gray-900 mb-2">{{ event.title }}</h1>
+                    <h2 *ngIf="event.subtitle" class="text-xl font-medium text-gray-600 mb-6">{{ event.subtitle }}</h2>
 
-                    <div class="flex flex-wrap gap-4 text-sm text-gray-500 mb-8 border-b pb-6">
+                    <div class="flex flex-col gap-3 text-sm text-gray-500 mb-8 border-b pb-6">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 mr-2 shrink-0 text-green-500" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                 </path>
                             </svg>
-                            {{ event.date | date:'dd/MM/yyyy HH:mm' }}
+                            {{ event.date | date:'dd/MM/yyyy - EEEE':'UTC' }}
                         </div>
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 mr-2 shrink-0 text-green-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            {{ event.date | date:'HH:mm':'UTC' }}
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2 shrink-0 text-green-500" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
@@ -63,12 +74,13 @@
                                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
                                 </path>
                             </svg>
-                            Vagas: {{ event.capacity - (event.registeredCount || 0) }} restantes
+                            Vagas: {{ event.capacity - (event.participants_count || 0) }} restantes
                         </div>
                     </div>
 
                     <h2 class="text-xl font-semibold text-gray-900 mb-3">Sobre o evento</h2>
-                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ event.description }}</p>
+                    <div class="text-gray-700 leading-relaxed ql-editor p-0"
+                        [innerHTML]="cleanDescription(event.description) | safeHtml"></div>
                 </div>
             </div>
 
@@ -109,6 +121,16 @@
                                 class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                             <span *ngIf="registrationForm.get('cpf')?.invalid && registrationForm.get('cpf')?.touched"
                                 class="text-red-500 text-xs mt-1">CPF inválido.</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                            <input type="text" formControlName="phone" mask="(00) 0000-0000||(00) 0 0000-0000"
+                                placeholder="(00) 00000-0000"
+                                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <span
+                                *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched"
+                                class="text-red-500 text-xs mt-1">Telefone inválido.</span>
                         </div>
 
                         <button type="submit" [disabled]="registrationForm.invalid || isSubmitting"

@@ -16,7 +16,7 @@ export class EventService {
     return this.http.get<EventModel[]>(`${this.apiUrl}/events`);
   }
 
-  getPublicEventById(id: number): Observable<EventModel> {
+  getPublicEventById(id: string): Observable<EventModel> {
     return this.http.get<EventModel>(`${this.apiUrl}/events/${id}`);
   }
 
@@ -40,11 +40,11 @@ export class EventService {
     return this.http.get<EventModel>(`${this.apiUrl}/admin/events/${id}`);
   }
 
-  createEvent(event: EventModel): Observable<EventModel> {
+  createEvent(event: EventModel | FormData): Observable<EventModel> {
     return this.http.post<EventModel>(`${this.apiUrl}/admin/events`, event);
   }
 
-  updateEvent(id: number, event: EventModel): Observable<EventModel> {
+  updateEvent(id: number, event: EventModel | FormData): Observable<EventModel> {
     return this.http.put<EventModel>(`${this.apiUrl}/admin/events/${id}`, event);
   }
 
@@ -54,5 +54,9 @@ export class EventService {
 
   getEventParticipants(id: number): Observable<Participant[]> {
     return this.http.get<Participant[]>(`${this.apiUrl}/admin/events/${id}/participants`);
+  }
+
+  deleteParticipant(eventId: number, participantId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/admin/events/${eventId}/participants/${participantId}`);
   }
 }

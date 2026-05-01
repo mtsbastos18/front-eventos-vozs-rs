@@ -9,7 +9,7 @@ import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
-  { path: 'events/:id', component: EventDetailsComponent },
+  { path: 'inscricao/:id', component: EventDetailsComponent },
   { path: 'login', component: LoginComponent },
   {
     path: 'admin',

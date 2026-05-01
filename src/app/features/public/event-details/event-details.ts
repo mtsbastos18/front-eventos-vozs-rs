@@ -7,10 +7,19 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { EventService } from '../../../core/services/event';
 import { EventModel } from '../../../shared/models/event';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar';
+import { environment } from '../../../../environments/environment';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
 @Component({
   selector: 'app-event-details',
-  imports: [CommonModule, ReactiveFormsModule, NavbarComponent, RouterLink, NgxMaskDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NavbarComponent,
+    RouterLink,
+    NgxMaskDirective,
+    SafeHtmlPipe,
+  ],
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })
@@ -23,11 +32,13 @@ export class EventDetailsComponent implements OnInit {
   event: EventModel | null = null;
   isLoading = true;
   error = '';
+  storageUrl = environment.storageUrl;
 
   registrationForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+    phone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
   });
 
   verifyForm: FormGroup = this.fb.group({
@@ -42,14 +53,14 @@ export class EventDetailsComponent implements OnInit {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.loadEventDetails(+idParam);
+      this.loadEventDetails(idParam);
     } else {
       this.error = 'ID do evento não fornecido.';
       this.isLoading = false;
     }
   }
 
-  loadEventDetails(id: number) {
+  loadEventDetails(id: string) {
     this.isLoading = true;
     this.eventService.getPublicEventById(id).subscribe({
       next: (data) => {
@@ -66,7 +77,7 @@ export class EventDetailsComponent implements OnInit {
 
   get isSoldOut(): boolean {
     if (!this.event) return false;
-    return (this.event.registeredCount || 0) >= this.event.capacity;
+    return (this.event.participants_count || 0) >= this.event.capacity;
   }
 
   onSubmit() {
@@ -80,6 +91,7 @@ export class EventDetailsComponent implements OnInit {
       name: formData.name,
       email: formData.email,
       document: formData.cpf, // cpf renomeado para document
+      phone: formData.phone,
       event_id: this.event.id,
     };
 
@@ -124,7 +136,7 @@ export class EventDetailsComponent implements OnInit {
 
         // Atualiza a contagem localmente após confirmar
         if (this.event) {
-          this.event.registeredCount = (this.event.registeredCount || 0) + 1;
+          this.event.participants_count = (this.event.participants_count || 0) + 1;
         }
       },
       error: (err) => {
@@ -135,5 +147,15 @@ export class EventDetailsComponent implements OnInit {
         );
       },
     });
+  }
+
+  // Crie uma função para limpar o HTML
+  cleanDescription(html: string) {
+    if (!html) return '';
+    // Substitui todos os non-breaking spaces por espaços normais, quebras de linha por <br> e parágrafos vazios por <p><br></p>
+    return html
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\n/g, '<br>')
+      .replace(/<p[^>]*><\/p>/g, '<p><br></p>');
   }
 }

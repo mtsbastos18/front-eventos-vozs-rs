@@ -4,5 +4,6 @@ export interface Participant {
   name: string;
   email: string;
   document: string;
+  phone: string;
   created_at?: string;
 }

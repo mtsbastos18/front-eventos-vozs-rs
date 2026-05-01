@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { QuillModule } from 'ngx-quill';
 import { EventService } from '../../../core/services/event';
 import { EventModel } from '../../../shared/models/event';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar';
@@ -9,7 +10,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-event-management',
-  imports: [CommonModule, ReactiveFormsModule, NavbarComponent, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, NavbarComponent, RouterLink, QuillModule],
   templateUrl: './event-management.html',
   styleUrl: './event-management.css',
 })
@@ -29,10 +30,12 @@ export class EventManagementComponent implements OnInit {
 
   eventForm: FormGroup = this.fb.group({
     title: ['', Validators.required],
+    subtitle: ['', [Validators.maxLength(255)]],
     description: ['', Validators.required],
     date: ['', Validators.required],
     location: ['', Validators.required],
     capacity: ['', [Validators.required, Validators.min(1)]],
+    image: [null],
   });
 
   ngOnInit(): void {
@@ -68,10 +71,12 @@ export class EventManagementComponent implements OnInit {
 
     this.eventForm.patchValue({
       title: event.title,
+      subtitle: event.subtitle || '',
       description: event.description,
       date: dateFormatted,
       location: event.location,
       capacity: event.capacity,
+      image: null,
     });
     this.showForm = true;
   }
@@ -81,14 +86,30 @@ export class EventManagementComponent implements OnInit {
     this.eventForm.reset();
   }
 
+  onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.eventForm.patchValue({ image: file });
+    }
+  }
+
   onSubmit() {
     if (this.eventForm.invalid) return;
 
     this.isSubmitting = true;
-    const eventData = this.eventForm.value;
+
+    const formData = new FormData();
+    const formValue = this.eventForm.value;
+
+    Object.keys(formValue).forEach((key) => {
+      const value = formValue[key];
+      if (value !== null && value !== undefined && value !== '') {
+        formData.append(key, value);
+      }
+    });
 
     if (this.isEditing && this.editingId) {
-      this.eventService.updateEvent(this.editingId, eventData).subscribe({
+      this.eventService.updateEvent(this.editingId, formData).subscribe({
         next: () => {
           this.isSubmitting = false;
           this.toastr.success('Evento atualizado com sucesso!', 'Sucesso');
@@ -101,7 +122,7 @@ export class EventManagementComponent implements OnInit {
         },
       });
     } else {
-      this.eventService.createEvent(eventData).subscribe({
+      this.eventService.createEvent(formData).subscribe({
         next: () => {
           this.isSubmitting = false;
           this.toastr.success('Evento criado com sucesso!', 'Sucesso');
