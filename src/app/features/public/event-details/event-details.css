@@ -15,3 +15,21 @@ h1.banner {
     overflow-wrap: break-word !important;
     white-space: normal !important;
 }
+
+/* Centraliza o Toastr na tela (horizontal e verticalmente) */
+::ng-deep .toast-top-center,
+::ng-deep .toast-center-center {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    position: fixed !important;
+    z-index: 9999 !important;
+}
+::ng-deep .toast-container {
+    width: 60vw !important;
+    pointer-events: none;
+}
+::ng-deep .toast {
+    pointer-events: all;
+}

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { forkJoin, Observable } from 'rxjs';
 import { EventService } from '../../../core/services/event';
 import { EventModel } from '../../../shared/models/event';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar';
@@ -18,6 +19,7 @@ export class LandingPageComponent implements OnInit {
   private toastr = inject(ToastrService);
 
   events: EventModel[] = [];
+  pastEvents: EventModel[] = [];
   isLoading = true;
   error = '';
   storageUrl = environment.storageUrl;
@@ -28,9 +30,14 @@ export class LandingPageComponent implements OnInit {
 
   loadEvents() {
     this.isLoading = true;
-    this.eventService.getPublicEvents().subscribe({
-      next: (data) => {
-        this.events = data;
+    forkJoin({
+      publicEvents: this.eventService.getPublicEvents(),
+      pastEvents: this.eventService.getPastEvents(),
+    }).subscribe({
+      next: ({ publicEvents, pastEvents }) => {
+        this.events = [...publicEvents];
+        this.pastEvents = [...pastEvents];
+        console.log('Eventos carregados:', this.events);
         this.isLoading = false;
       },
       error: (err) => {
@@ -40,6 +47,14 @@ export class LandingPageComponent implements OnInit {
         console.error(err);
       },
     });
+  }
+
+  getEvents(): Observable<EventModel[]> {
+    return this.eventService.getPublicEvents();
+  }
+
+  getPastEvents(): Observable<EventModel[]> {
+    return this.eventService.getPastEvents();
   }
 
   stripHtml(html: string, maxLength: number = 10): string {

@@ -5,5 +5,8 @@ export interface Participant {
   email: string;
   document: string;
   phone: string;
+  company?: string;
+  position?: string;
+  city?: string;
   created_at?: string;
 }

@@ -16,6 +16,10 @@ export class EventService {
     return this.http.get<EventModel[]>(`${this.apiUrl}/events`);
   }
 
+  getPastEvents(): Observable<EventModel[]> {
+    return this.http.get<EventModel[]>(`${this.apiUrl}/events/past`);
+  }
+
   getPublicEventById(id: string): Observable<EventModel> {
     return this.http.get<EventModel>(`${this.apiUrl}/events/${id}`);
   }
@@ -58,5 +62,11 @@ export class EventService {
 
   deleteParticipant(eventId: number, participantId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/admin/events/${eventId}/participants/${participantId}`);
+  }
+
+  exportEventParticipants(eventId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/admin/events/${eventId}/participants/export`, {
+      responseType: 'blob',
+    });
   }
 }

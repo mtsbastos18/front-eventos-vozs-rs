@@ -39,6 +39,9 @@ export class EventDetailsComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
     phone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
+    company: ['', [Validators.required]],
+    position: ['', [Validators.required]],
+    city: ['', [Validators.required]],
   });
 
   verifyForm: FormGroup = this.fb.group({
@@ -93,6 +96,9 @@ export class EventDetailsComponent implements OnInit {
       document: formData.cpf, // cpf renomeado para document
       phone: formData.phone,
       event_id: this.event.id,
+      company: formData.company,
+      position: formData.position,
+      city: formData.city,
     };
 
     this.eventService.registerParticipant(participantData).subscribe({
@@ -103,6 +109,9 @@ export class EventDetailsComponent implements OnInit {
         this.toastr.info(
           'Um código de 6 dígitos foi enviado para o seu e-mail.',
           'Verifique seu e-mail',
+          {
+            timeOut: 5000,
+          },
         );
       },
       error: (err) => {
@@ -129,7 +138,9 @@ export class EventDetailsComponent implements OnInit {
     this.eventService.verifyParticipant(verifyData).subscribe({
       next: () => {
         this.isVerifying = false;
-        this.toastr.success('Sua inscrição foi confirmada com sucesso!', 'Inscrição Confirmada');
+        this.toastr.success('Sua inscrição foi confirmada com sucesso!', 'Inscrição Confirmada', {
+          timeOut: 10000,
+        });
         this.registrationStep = 'form';
         this.registrationForm.reset();
         this.verifyForm.reset();

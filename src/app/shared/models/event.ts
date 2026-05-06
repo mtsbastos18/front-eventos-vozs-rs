@@ -9,4 +9,8 @@ export interface EventModel {
   image_path?: string;
   participants_count?: number;
   slug?: string;
+  video_url?: string;
+  gallery?: string[];
+  created_at?: string;
+  updated_at?: string;
 }

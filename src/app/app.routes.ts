@@ -6,10 +6,12 @@ import { DashboardComponent } from './features/admin/dashboard/dashboard';
 import { EventManagementComponent } from './features/admin/event-management/event-management';
 import { ParticipantListComponent } from './features/admin/participant-list/participant-list';
 import { authGuard } from './core/guards/auth-guard';
+import { PastEventComponent } from './features/public/past-event/past-event';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
   { path: 'inscricao/:id', component: EventDetailsComponent },
+  { path: 'eventos-passados/:id', component: PastEventComponent },
   { path: 'login', component: LoginComponent },
   {
     path: 'admin',
