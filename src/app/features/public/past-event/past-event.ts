@@ -6,6 +6,7 @@ import { EventService } from '../../../core/services/event';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar';
 import { environment } from '../../../../environments/environment';
 import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-past-event',
@@ -26,6 +27,7 @@ export class PastEventComponent implements OnInit {
   // Variáveis para as novas seções
   videoUrl: SafeResourceUrl | null = null;
   galleryImages: string[] = [];
+  postEventData: any;
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -40,23 +42,46 @@ export class PastEventComponent implements OnInit {
   loadEventDetails(id: string) {
     this.isLoading = true;
 
+    const handleRequests$ = {
+      event: this.eventService.getPublicEventById(id),
+      postEvent: this.eventService.getPostEventDetails(id),
+    };
+
+    // forkJoin(handleRequests$).subscribe({
+    //   next: ({ event, postEvent }) => {
+    //     this.event = event;
+    //     console.log('Detalhes do evento:', event);
+    //     console.log('Detalhes pós-evento:', postEvent);
+    //   },
+    //   error: (err) => {
+    //     this.error = 'Não foi possível carregar os detalhes do evento passado.';
+    //     console.error(err);
+    //   },
+    // });
+
     // Utilize o serviço apropriado de busca (ex: getPublicEventById)
     this.eventService.getPublicEventById(id).subscribe({
       next: (data) => {
         this.event = data;
-
+        this.eventService.getPostEventDetails(this.event.id).subscribe((response) => {
+          this.postEventData = response;
+          const rawVideoUrl =
+            this.storageUrl + response.video_path || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+          this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(rawVideoUrl);
+          this.galleryImages =
+            response.images.map((img: string) => `${this.storageUrl}${img}`) || [];
+          console.log('imagens', this.galleryImages);
+        });
         // Simulação de Link de Vídeo (Substitua por data.video_url se existir no seu backend)
-        const rawVideoUrl = data.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
-        this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(rawVideoUrl);
 
         // Simulação de Galeria de Fotos (Substitua por data.gallery se existir no seu backend)
-        this.galleryImages = data.gallery || [
-          'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-          'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=800&q=80',
-          'https://images.unsplash.com/photo-1475721025870-2460665d9118?w=800&q=80',
-          'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80',
-          'https://images.unsplash.com/photo-1523580494112-071d16940353?w=800&q=80',
-        ];
+        // this.galleryImages = data.gallery || [
+        //   'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+        //   'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=800&q=80',
+        //   'https://images.unsplash.com/photo-1475721025870-2460665d9118?w=800&q=80',
+        //   'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80',
+        //   'https://images.unsplash.com/photo-1523580494112-071d16940353?w=800&q=80',
+        // ];
 
         this.isLoading = false;
       },

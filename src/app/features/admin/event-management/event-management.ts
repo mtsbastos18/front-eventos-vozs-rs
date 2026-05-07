@@ -38,6 +38,15 @@ export class EventManagementComponent implements OnInit {
     image: [null],
   });
 
+  showPostEventForm = false;
+  selectedPostEventId: number | null = null;
+  selectedVideo: File | null = null;
+  selectedImages: File[] = [];
+
+  postEventForm: FormGroup = this.fb.group({
+    description: ['', Validators.required],
+  });
+
   ngOnInit(): void {
     this.loadEvents();
   }
@@ -147,5 +156,68 @@ export class EventManagementComponent implements OnInit {
         error: () => this.toastr.error('Erro ao excluir evento.', 'Erro'),
       });
     }
+  }
+
+  openPostEventForm(event: EventModel) {
+    this.selectedPostEventId = event.id;
+    this.postEventForm.reset();
+    this.selectedVideo = null;
+    this.selectedImages = [];
+    this.showPostEventForm = true;
+  }
+
+  closePostEventForm() {
+    this.showPostEventForm = false;
+    this.selectedPostEventId = null;
+    this.selectedVideo = null;
+    this.selectedImages = [];
+    this.postEventForm.reset();
+  }
+
+  onVideoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.selectedVideo = file;
+    }
+  }
+
+  onImagesSelected(event: Event) {
+    const files = (event.target as HTMLInputElement).files;
+    if (files) {
+      this.selectedImages = Array.from(files); // Converte o FileList para Array
+    }
+  }
+
+  onSubmitPostEvent() {
+    if (this.postEventForm.invalid || !this.selectedPostEventId) return;
+
+    this.isSubmitting = true;
+    const formData = new FormData();
+
+    // Adiciona a descrição
+    formData.append('description', this.postEventForm.get('description')?.value);
+
+    // Adiciona o vídeo se existir
+    if (this.selectedVideo) {
+      formData.append('video', this.selectedVideo);
+    }
+
+    // Adiciona as imagens como um array (images[])
+    this.selectedImages.forEach((image) => {
+      formData.append('images[]', image);
+    });
+
+    this.eventService.savePostEventDetail(this.selectedPostEventId, formData).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.toastr.success('Detalhes pós-evento salvos com sucesso!', 'Sucesso');
+        this.closePostEventForm();
+        this.loadEvents(); // Recarrega a tabela se necessário
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.toastr.error('Erro ao salvar os detalhes do evento.', 'Erro');
+      },
+    });
   }
 }

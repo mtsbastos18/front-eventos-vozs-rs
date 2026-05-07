@@ -69,4 +69,14 @@ export class EventService {
       responseType: 'blob',
     });
   }
+
+  getPostEventDetails(eventId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/events/${eventId}/post-detail`);
+  }
+
+  // Adicione este método dentro da classe EventService
+  savePostEventDetail(eventId: number, data: FormData): Observable<any> {
+    // Utilizando POST conforme o seu payload. O Angular injeta o Content-Type: multipart/form-data + boundary automaticamente ao receber um FormData
+    return this.http.post(`${this.apiUrl}/admin/events/${eventId}/post-detail`, data);
+  }
 }

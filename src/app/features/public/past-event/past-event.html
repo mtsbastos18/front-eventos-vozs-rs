@@ -62,20 +62,18 @@
                     </div>
                 </div>
 
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Como foi o encontro</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    {{postEventData ? "Como foi o evento" : "Em breve..."}}</h2>
                 <div class="text-gray-700 leading-relaxed ql-editor p-0"
-                    [innerHTML]="cleanDescription(event.description) | safeHtml"></div>
+                    [innerHTML]="cleanDescription(postEventData.description) | safeHtml"></div>
             </div>
 
             <!-- Vídeo Integrado -->
             <div *ngIf="videoUrl" class="bg-white rounded-lg shadow-md p-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">Assista aos melhores momentos</h3>
-                <div class="w-full rounded-lg overflow-hidden bg-black shadow-inner">
+                <div class="w-full rounded-lg overflow-hidden bg-white shadow-inner">
                     <!-- Proporção 16:9 responsiva com altura adaptável -->
-                    <iframe [src]="videoUrl" title="Vídeo do evento" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen class="w-full h-[300px] md:h-[450px] lg:h-[550px]">
-                    </iframe>
+                    <video [src]="videoUrl" class="w-full" controls></video>
                 </div>
             </div>
 
