@@ -1,0 +1,45 @@
+/* Scroll vertical para galeria de imagens */
+.gallery-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: #a3a3a3 #f3f4f6;
+}
+.gallery-scroll::-webkit-scrollbar {
+	width: 8px;
+}
+.gallery-scroll::-webkit-scrollbar-thumb {
+	background: #a3a3a3;
+	border-radius: 8px;
+}
+.gallery-scroll::-webkit-scrollbar-track {
+	background: #f3f4f6;
+	border-radius: 8px;
+}
+/* Imagem flutuante para artigo de notícia */
+.article-image-text {
+	position: relative;
+}
+.article-float-img {
+	float: left;
+	width: 450px;
+	max-width: 45vw;
+	height: auto;
+	margin: 0 2rem 1rem 0;
+	border-radius: 0.75rem;
+	box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+	object-fit: cover;
+}
+@media (max-width: 768px) {
+	.article-float-img {
+		float: none;
+		display: block;
+		margin: 0 auto 1rem auto;
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
+/* Layout lado a lado para imagem e texto */
+.ql-editor {
+	position: relative;
+	z-index: 1;
+}

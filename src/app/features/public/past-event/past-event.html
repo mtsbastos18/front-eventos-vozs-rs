@@ -24,6 +24,8 @@
             {{ error }}
         </div>
 
+
+
         <div *ngIf="!isLoading && event" class="space-y-10">
 
             <!-- Informações Gerais e Descrição -->
@@ -62,14 +64,41 @@
                     </div>
                 </div>
 
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                    {{postEventData ? "Como foi o evento" : "Em breve..."}}</h2>
-                <div class="text-gray-700 leading-relaxed ql-editor p-0"
-                    [innerHTML]="cleanDescription(postEventData.description) | safeHtml"></div>
+                <div class="w-full mb-8">
+                    <div class="article-image-text">
+                        <h2 *ngIf="!postEventData" class="text-2xl font-bold text-gray-900 mb-4">
+                            {{"Em breve..."}}
+                        </h2>
+                        <div *ngIf="postEventData" class="text-gray-700 leading-relaxed ql-editor p-0">
+                            <img [src]="galleryImages[0]" alt="Registro do evento" class="article-float-img" />
+
+                            <span [innerHTML]="cleanDescription(postEventData?.description) | safeHtml"></span>
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="galleryImages && galleryImages.length > 0">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-4 max-h-96 overflow-y-auto gallery-scroll">
+                        <div *ngFor="let img of galleryImages"
+                            class="rounded-lg overflow-hidden shadow border border-gray-100 cursor-pointer"
+                            (click)="openImageModal(img)">
+                            <img [src]="img" alt="Registro do evento"
+                                class="w-full h-40 md:h-48 object-cover hover:scale-105 transition-transform duration-500">
+                        </div>
+                    </div>
+                    <!-- Modal de Imagem Ampliada -->
+                    <div *ngIf="showImageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+                        <div class="relative max-w-3xl w-full mx-4">
+                            <button (click)="closeImageModal()"
+                                class="absolute top-2 right-2 text-white text-3xl font-bold z-10">&times;</button>
+                            <img [src]="modalImageUrl" alt="Imagem ampliada"
+                                class="w-full max-h-[80vh] rounded-lg shadow-2xl object-contain bg-white">
+                        </div>
+                    </div>
+                </ng-container>
             </div>
 
             <!-- Vídeo Integrado -->
-            <div *ngIf="videoUrl" class="bg-white rounded-lg shadow-md p-8">
+            <div *ngIf="videoUrl != null" class="bg-white rounded-lg shadow-md p-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">Assista aos melhores momentos</h3>
                 <div class="w-full rounded-lg overflow-hidden bg-white shadow-inner">
                     <!-- Proporção 16:9 responsiva com altura adaptável -->
@@ -78,10 +107,9 @@
             </div>
 
             <!-- Carrossel de Fotos -->
-            <div *ngIf="galleryImages && galleryImages.length > 0" class="bg-white rounded-lg shadow-md p-8">
+            <!-- <div *ngIf="galleryImages && galleryImages.length > 0" class="bg-white rounded-lg shadow-md p-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">Galeria de Fotos</h3>
 
-                <!-- Tailwind carousel (Scroll X with Snap) -->
                 <div class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar">
                     <div *ngFor="let img of galleryImages"
                         class="snap-center shrink-0 w-72 md:w-96 rounded-lg overflow-hidden shadow border border-gray-100 cursor-pointer">
@@ -89,7 +117,7 @@
                             class="w-full h-56 md:h-64 object-cover hover:scale-105 transition-transform duration-500">
                     </div>
                 </div>
-            </div>
+            </div> -->
 
         </div>
     </div>

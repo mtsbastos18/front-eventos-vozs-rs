@@ -45,7 +45,9 @@ export class EventManagementComponent implements OnInit {
 
   postEventForm: FormGroup = this.fb.group({
     description: ['', Validators.required],
+    flickrUrl: ['', [Validators.pattern('https?://(www.)?flickr.com/.*')]],
   });
+  updatePostEvent: boolean = false;
 
   ngOnInit(): void {
     this.loadEvents();
@@ -159,11 +161,26 @@ export class EventManagementComponent implements OnInit {
   }
 
   openPostEventForm(event: EventModel) {
-    this.selectedPostEventId = event.id;
     this.postEventForm.reset();
-    this.selectedVideo = null;
-    this.selectedImages = [];
-    this.showPostEventForm = true;
+
+    this.eventService.getPostEventDetails(event.id.toString()).subscribe({
+      next: (response) => {
+        this.postEventForm.patchValue({
+          description: response.description || '',
+        });
+        this.selectedPostEventId = event.id;
+        this.selectedVideo = null;
+        this.selectedImages = [];
+        this.showPostEventForm = true;
+        this.updatePostEvent = true;
+      },
+      error: () => {
+        this.selectedPostEventId = event.id;
+        this.selectedVideo = null;
+        this.selectedImages = [];
+        this.showPostEventForm = true;
+      },
+    });
   }
 
   closePostEventForm() {
@@ -196,6 +213,7 @@ export class EventManagementComponent implements OnInit {
 
     // Adiciona a descrição
     formData.append('description', this.postEventForm.get('description')?.value);
+    formData.append('flickrUrl', this.postEventForm.get('flickrUrl')?.value);
 
     // Adiciona o vídeo se existir
     if (this.selectedVideo) {

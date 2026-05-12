@@ -28,7 +28,9 @@ export class PastEventComponent implements OnInit {
   videoUrl: SafeResourceUrl | null = null;
   galleryImages: string[] = [];
   postEventData: any;
-
+  // Modal de imagem ampliada
+  showImageModal = false;
+  modalImageUrl = '';
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -67,10 +69,17 @@ export class PastEventComponent implements OnInit {
           this.postEventData = response;
           const rawVideoUrl =
             this.storageUrl + response.video_path || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
-          this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(rawVideoUrl);
+          this.videoUrl =
+            response.video_path != null
+              ? this.sanitizer.bypassSecurityTrustResourceUrl(rawVideoUrl)
+              : null;
+          console.log('videoUrl', this.videoUrl);
           this.galleryImages =
             response.images.map((img: string) => `${this.storageUrl}${img}`) || [];
-          console.log('imagens', this.galleryImages);
+
+          if (response.flickr_images) {
+            this.galleryImages.push(...response.flickr_images);
+          }
         });
         // Simulação de Link de Vídeo (Substitua por data.video_url se existir no seu backend)
 
@@ -99,5 +108,15 @@ export class PastEventComponent implements OnInit {
       .replace(/&nbsp;/g, ' ')
       .replace(/\n/g, '<br>')
       .replace(/<p[^>]*><\/p>/g, '<p><br></p>');
+  }
+
+  openImageModal(imgUrl: string) {
+    this.modalImageUrl = imgUrl;
+    this.showImageModal = true;
+  }
+
+  closeImageModal() {
+    this.showImageModal = false;
+    this.modalImageUrl = '';
   }
 }
