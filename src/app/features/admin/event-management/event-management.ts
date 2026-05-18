@@ -228,7 +228,7 @@ export class EventManagementComponent implements OnInit {
     this.eventService.savePostEventDetail(this.selectedPostEventId, formData).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.toastr.success('Detalhes pós-evento salvos com sucesso!', 'Sucesso');
+        this.toastr.success('Detalhes pós-evento salvos com sucesso! ', 'Sucesso');
         this.closePostEventForm();
         this.loadEvents(); // Recarrega a tabela se necessário
       },
