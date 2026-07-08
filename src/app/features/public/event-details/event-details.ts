@@ -50,7 +50,7 @@ export class EventDetailsComponent implements OnInit {
 
   isSubmitting = false;
   isVerifying = false;
-  registrationStep: 'form' | 'verification' = 'form';
+  registrationStep: 'form' | 'verification' | 'confirmation' = 'form';
   registeredEmail = '';
 
   ngOnInit(): void {
@@ -105,14 +105,9 @@ export class EventDetailsComponent implements OnInit {
       next: () => {
         this.isSubmitting = false;
         this.registeredEmail = participantData.email;
-        this.registrationStep = 'verification';
-        this.toastr.info(
-          'Um código de 6 dígitos foi enviado para o seu e-mail.',
-          'Verifique seu e-mail',
-          {
-            timeOut: 5000,
-          },
-        );
+        this.registrationStep = 'confirmation';
+
+        this.registrationForm.reset();
       },
       error: (err) => {
         console.log('Erro na inscrição:', err);

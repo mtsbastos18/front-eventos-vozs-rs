@@ -70,7 +70,8 @@
                             {{"Em breve..."}}
                         </h2>
                         <div *ngIf="postEventData" class="text-gray-700 leading-relaxed ql-editor p-0">
-                            <img [src]="galleryImages[0]" alt="Registro do evento" class="article-float-img" />
+                            <img *ngIf="galleryImages && galleryImages.length > 0" [src]="galleryImages[0]"
+                                alt="Registro do evento" class="article-float-img" />
 
                             <span [innerHTML]="cleanDescription(postEventData?.description) | safeHtml"></span>
                         </div>
@@ -98,11 +99,18 @@
             </div>
 
             <!-- Vídeo Integrado -->
-            <div *ngIf="videoUrl != null" class="bg-white rounded-lg shadow-md p-8">
+            <div *ngIf="videoUrl != null || youtubeVideoUrl != null" class="bg-white rounded-lg shadow-md p-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">Assista aos melhores momentos</h3>
-                <div class="w-full rounded-lg overflow-hidden bg-white shadow-inner">
-                    <!-- Proporção 16:9 responsiva com altura adaptável -->
+
+                <div *ngIf="videoUrl != null" class="w-full rounded-lg overflow-hidden bg-white shadow-inner mb-6">
                     <video [src]="videoUrl" class="w-full" controls></video>
+                </div>
+
+                <div *ngIf="youtubeVideoUrl != null" class="w-full rounded-lg overflow-hidden bg-white shadow-inner"
+                    style="aspect-ratio: 16/9;">
+                    <iframe [src]="youtubeVideoUrl" width="100%" height="100%" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
                 </div>
             </div>
 

@@ -26,6 +26,7 @@ export class PastEventComponent implements OnInit {
 
   // Variáveis para as novas seções
   videoUrl: SafeResourceUrl | null = null;
+  youtubeVideoUrl: SafeResourceUrl | null = null;
   galleryImages: string[] = [];
   postEventData: any;
   // Modal de imagem ampliada
@@ -74,6 +75,11 @@ export class PastEventComponent implements OnInit {
               ? this.sanitizer.bypassSecurityTrustResourceUrl(rawVideoUrl)
               : null;
           console.log('videoUrl', this.videoUrl);
+
+          if (response.youtube_video_url) {
+            this.youtubeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.getEmbedUrl(response.youtube_video_url));
+          }
+
           this.galleryImages =
             response.images.map((img: string) => `${this.storageUrl}${img}`) || [];
 
@@ -108,6 +114,18 @@ export class PastEventComponent implements OnInit {
       .replace(/&nbsp;/g, ' ')
       .replace(/\n/g, '<br>')
       .replace(/<p[^>]*><\/p>/g, '<p><br></p>');
+  }
+
+  getEmbedUrl(url: string): string {
+    let videoId = '';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      videoId = match[2];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return url;
   }
 
   openImageModal(imgUrl: string) {

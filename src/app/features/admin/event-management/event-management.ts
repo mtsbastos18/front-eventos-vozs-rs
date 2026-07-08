@@ -46,6 +46,7 @@ export class EventManagementComponent implements OnInit {
   postEventForm: FormGroup = this.fb.group({
     description: ['', Validators.required],
     flickrUrl: ['', [Validators.pattern('https?://(www.)?flickr.com/.*')]],
+    youtube_video_url: ['', [Validators.pattern('https?://(www.)?youtube.com/.*')]],
   });
   updatePostEvent: boolean = false;
 
@@ -167,6 +168,7 @@ export class EventManagementComponent implements OnInit {
       next: (response) => {
         this.postEventForm.patchValue({
           description: response.description || '',
+          youtube_video_url: response.youtube_video_url || '',
         });
         this.selectedPostEventId = event.id;
         this.selectedVideo = null;
@@ -214,7 +216,9 @@ export class EventManagementComponent implements OnInit {
     // Adiciona a descrição
     formData.append('description', this.postEventForm.get('description')?.value);
     formData.append('flickrUrl', this.postEventForm.get('flickrUrl')?.value);
-
+    if (this.postEventForm.get('youtube_video_url')?.value) {
+      formData.append('youtube_video_url', this.postEventForm.get('youtube_video_url')?.value);
+    }
     // Adiciona o vídeo se existir
     if (this.selectedVideo) {
       formData.append('video', this.selectedVideo);
